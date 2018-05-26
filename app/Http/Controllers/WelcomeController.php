@@ -8,10 +8,11 @@ use App\Http\Requests;
 use Illuminate\Support\Facades\DB;  
 use SimpleSoftwareIO\QrCode\BaconQrCodeGenerator;
 
+
 use Monolog\Logger;
 use Storage;
 use Monolog\Handler\StreamHandler;
-
+use Auth;
 class WelcomeController extends Controller
 {
     //
@@ -43,9 +44,7 @@ class WelcomeController extends Controller
 	function getMytest(){
 	   $student=DB::select("select * from articles");  
     //返回一个二维数组  $student  
-    var_dump($student);  
-        //以节点树的形式输出结果  
-    dd($student); 
+   		return view('articles',['student' => $student]);
 	}
 	function edit(){
 	 echo 993;
@@ -61,5 +60,20 @@ class WelcomeController extends Controller
     	$log = new Logger('register');
 $log->pushHandler(new StreamHandler('path/to/your.log',Logger::INFO) );
 $log->addInfo('用户注册信息:111'.$input);
+	}
+	
+	/*测试一个表单留言功能*/
+	function anyMessage(Request $request){
+		if ($request->isMethod('post')) {
+			$allData = $request->all();
+			DB::table('articles')->insert([
+            'title' => $allData['title'],
+            'body' =>  $allData['content'],
+			'user_id'=>Auth::user()->id,
+			'created_at' => date('Y-m-d H:i:s'),
+        ]);
+		 exit(var_dump('执行成功！'));
+		}
+		return view('message');
 	}
 }
