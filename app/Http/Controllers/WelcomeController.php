@@ -50,10 +50,30 @@ class WelcomeController extends Controller
 	 echo 993;
 	}
 	
-	function getMyewm(){
-		$qrcode = new BaconQrCodeGenerator;
-		$abc=$qrcode->size(200)->generate('http://laravelacademy.org');
-		echo $abc;
+	function anyMyewm(Request $request){
+		if($request->isMethod('post')){
+			$url=$request->input('url');
+			$qrcode = new BaconQrCodeGenerator;
+			//$abc=$qrcode->size(200)->generate($url);
+			$file=time().'.png';
+			$filename='qrcodes/'.time().'.png';
+			$qrcode->format('png')->size(200)->generate($url,public_path($filename));
+			
+			
+			header("Content-Type:text/html;charset=utf-8");
+         header("Content-type:application/force-download");
+         header("Content-Type:application/octet-stream");
+         header("Accept-Ranges:bytes");
+         header("Content-Length:".filesize($filename));//指定下载文件的大小
+         header('Content-Disposition:attachment;filename="'.$file.'"');
+         //必要时清除缓存
+        ob_clean();
+        flush();
+         readfile($filename);
+         exit();
+		}
+		return view('erweima');
+		
 	}
 	public function getLog(){
 		$input='xiaochao';
